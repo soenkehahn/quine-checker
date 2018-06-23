@@ -24,6 +24,11 @@ pythonQuine = unlines $
   "    sys.stdout.write(fh.read())" :
   []
 
+stderrQuine :: String
+stderrQuine = unlines $
+  "foo/quine: 1: foo/quine: foo/quine:: not found" :
+  []
+
 pythonNonQuine :: String
 pythonNonQuine = unlines $
   "#!/usr/bin/env python3" :
@@ -38,8 +43,14 @@ spec = around_ (inTempDirectory . hSilence [stdout, stderr]) $ do
         writeQuineFile "foo" pythonQuine
         run ["foo"] `shouldReturn` ExitSuccess
 
+      it "allows quines that exit with a non-zero exitcode" $ do
+        let quine = pythonQuine ++ "\nsys.exit(1)"
+        writeQuineFile "foo" quine
+        run ["foo"] `shouldReturn` ExitSuccess
+
       it "allows quines through stderr" $ do
-        pending
+        writeQuineFile "foo" stderrQuine
+        run ["foo"] `shouldReturn` ExitSuccess
 
       it "prints the quine" $ do
         writeQuineFile "foo" pythonQuine

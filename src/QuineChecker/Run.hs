@@ -1,6 +1,7 @@
 
 module QuineChecker.Run where
 
+import Prelude hiding (log)
 import System.Exit
 import Data.List
 import System.IO
@@ -32,17 +33,21 @@ checkQuine directory = do
   executable <- fileAccess quineFile False False True
   when (not executable) $
     throwIO $ ErrorCall ("executable flag not set on: " ++ quineFile)
-  Stdout stdout <- cmd quineFile
+  (Exit _, Stdout stdout, Stderr stderr) <- cmd quineFile
+  let output = stdout ++ stderr
   code <- readFile quineFile
-  if code == stdout
+  if code == output
     then do
-      hPutStrLn stderr ("this is a quine: " ++ quineFile ++ ":\n")
-      hPutStrLn stderr code
+      log ("this is a quine: " ++ quineFile ++ ":\n")
+      log code
       return ExitSuccess
     else do
-      hPutStrLn stderr ("not a quine: " ++ quineFile)
-      hPutStrLn stderr ("diff:\n" ++ diff code stdout)
+      log ("not a quine: " ++ quineFile)
+      log ("diff:\n" ++ diff code output)
       return $ ExitFailure 1
+
+log :: String -> IO ()
+log = hPutStrLn stderr
 
 diff :: String -> String -> String
 diff a b =
