@@ -8,6 +8,7 @@ dependencies:
   - base
   - shake
   - filepath
+  - directory
   - unix
 
 tests:
@@ -20,5 +21,8 @@ tests:
       - hspec
       - mockery
       - silently
-      - directory
 
+executables:
+  quine-checker:
+    main: Main.hs
+    source-dirs: src
