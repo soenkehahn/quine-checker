@@ -8,7 +8,7 @@ import Control.Monad
 import Data.Char
 import Data.Foldable
 import Data.List
-import Development.Shake (unit, cmd, Stdout(..), CmdOption(..))
+import Development.Shake (unit, cmd, Stdouterr(..), CmdOption(..))
 import System.Directory
 import System.FilePath
 
@@ -20,8 +20,9 @@ main = do
   files <- filter (not . ("." `isPrefixOf`)) <$>
     getDirectoryContents "base-image/tests"
   forM_ files $ \ file -> do
+    putStrLn ("testing " ++ file)
     currentDir <- getCurrentDirectory
-    Stdout (strip -> output) <- cmd (EchoStderr True) (EchoStdout True)
+    Stdouterr (strip -> output) <- cmd (EchoStderr True) (EchoStdout True)
       "docker run --rm -t -v"
       (currentDir </> "base-image/tests" </> file ++ ":" ++ "/root" </> file)
       "soenkehahn/rc-quines-candidate" ("/root" </> file)
