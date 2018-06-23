@@ -42,7 +42,9 @@ spec = around_ (inTempDirectory . hSilence [stdout, stderr]) $ do
         pending
 
       it "prints the quine" $ do
-        pending
+        writeQuineFile "foo" pythonQuine
+        output <- hCapture_ [stderr] $ run ["foo"]
+        output `shouldContain` ("this is a quine: foo/quine:\n\n" ++ pythonQuine)
 
       it "can checks multiple quines" $ do
         writeQuineFile "foo" pythonQuine

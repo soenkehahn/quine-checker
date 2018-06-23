@@ -35,7 +35,10 @@ checkQuine directory = do
   Stdout stdout <- cmd quineFile
   code <- readFile quineFile
   if code == stdout
-    then return ExitSuccess
+    then do
+      hPutStrLn stderr ("this is a quine: " ++ quineFile ++ ":\n")
+      hPutStrLn stderr code
+      return ExitSuccess
     else do
       hPutStrLn stderr ("not a quine: " ++ quineFile)
       hPutStrLn stderr ("diff:\n" ++ diff code stdout)
