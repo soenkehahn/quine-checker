@@ -2,6 +2,7 @@
 module QuineChecker.Run where
 
 import System.Exit
+import Data.List
 import System.IO
 import System.Posix.Files
 import Development.Shake hiding (doesDirectoryExist, doesFileExist)
@@ -9,6 +10,7 @@ import Control.Monad
 import System.Directory
 import Control.Exception
 import System.FilePath
+import Data.Algorithm.Diff
 
 run :: [String] -> IO ExitCode
 run (directory : rest) = do
@@ -36,4 +38,18 @@ checkQuine directory = do
     then return ExitSuccess
     else do
       hPutStrLn stderr ("not a quine: " ++ quineFile)
+      hPutStrLn stderr ("diff:\n" ++ diff code stdout)
       return $ ExitFailure 1
+
+diff :: String -> String -> String
+diff a b =
+  intercalate "\n" $ map renderDiff $
+    getDiff
+      (map (: []) (lines a))
+      (map (: []) (lines b))
+  where
+    renderDiff :: Diff [String] -> String
+    renderDiff d = concat $ case d of
+      Both f _ -> map ("  " ++) f
+      First f -> map ("- " ++) f
+      Second s -> map ("+ " ++) s

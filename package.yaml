@@ -10,6 +10,7 @@ dependencies:
   - filepath
   - directory
   - unix
+  - Diff
 
 tests:
   spec:

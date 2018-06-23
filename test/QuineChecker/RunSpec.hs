@@ -31,7 +31,7 @@ pythonNonQuine = unlines $
   []
 
 spec :: Spec
-spec = around_ (inTempDirectory . silence) $ do
+spec = around_ (inTempDirectory . hSilence [stdout, stderr]) $ do
   describe "run" $ do
     describe "when pointed to directories containing a quine" $ do
       it "exits with exit code 0" $ do
@@ -60,7 +60,15 @@ spec = around_ (inTempDirectory . silence) $ do
         output `shouldContain` "not a quine: foo/quine"
 
       it "outputs a nice diff" $ do
-        pending
+        writeQuineFile "foo" pythonNonQuine
+        output <- hCapture_ [stderr] $ run ["foo"]
+        let expected = unlines $
+              "diff:" :
+              "- #!/usr/bin/env python3" :
+              "- print('Hello, World!')" :
+              "+ Hello, World!" :
+              []
+        output `shouldContain` expected
 
       it "checks all given directories" $ do
         writeQuineFile "foo" pythonQuine
