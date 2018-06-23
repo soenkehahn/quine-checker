@@ -5,7 +5,9 @@ ghc-options:
   - -Wno-name-shadowing
 
 dependencies:
+  - base
   - shake
+  - filepath
 
 tests:
   spec:
@@ -14,7 +16,8 @@ tests:
       - test
       - src
     dependencies:
-      - base
       - hspec
       - mockery
       - silently
+      - directory
+
