@@ -3,6 +3,7 @@ module QuineChecker.RunSpec where
 import QuineChecker.Run
 import System.Directory
 import Development.Shake
+import System.IO
 import System.Exit
 import System.FilePath
 import Test.Hspec
@@ -54,7 +55,9 @@ spec = around_ (inTempDirectory . silence) $ do
         run ["foo"] `shouldReturn` ExitFailure 1
 
       it "gives a nice error message" $ do
-        pending
+        writeQuineFile "foo" pythonNonQuine
+        output <- hCapture_ [stderr] $ run ["foo"]
+        output `shouldContain` "not a quine: foo/quine"
 
       it "outputs a nice diff" $ do
         pending
@@ -63,10 +66,6 @@ spec = around_ (inTempDirectory . silence) $ do
         writeQuineFile "foo" pythonQuine
         writeQuineFile "bar" pythonNonQuine
         run ["foo", "bar"] `shouldReturn` ExitFailure 1
-
-    describe "when ./quine doesn't exist" $ do
-      it "throws a good error message" $ do
-        pending
 
     describe "when given a directory that doesn't exist" $ do
       it "gives a nice error message" $ do
