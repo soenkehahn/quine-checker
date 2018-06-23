@@ -70,8 +70,13 @@ spec = around_ (inTempDirectory . silence) $ do
 
     describe "when given a directory that doesn't exist" $ do
       it "gives a nice error message" $ do
-        run ["foo"] `shouldThrow` errorCall "directory does not exist: foo"
+        run ["foo"] `shouldThrow` errorCall "directory not found: foo"
 
       it "checks all given directories" $ do
         writeQuineFile "foo" pythonQuine
-        run ["foo", "bar"] `shouldThrow` errorCall "directory does not exist: bar"
+        run ["foo", "bar"] `shouldThrow` errorCall "directory not found: bar"
+
+    describe "when the directory does not contain a ./quine file" $ do
+      it "gives a nice error" $ do
+        createDirectory "foo"
+        run ["foo"] `shouldThrow` errorCall "quine file not found: foo/quine"

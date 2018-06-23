@@ -2,7 +2,7 @@
 module QuineChecker.Run where
 
 import System.Exit
-import Development.Shake hiding (doesDirectoryExist)
+import Development.Shake hiding (doesDirectoryExist, doesFileExist)
 import Control.Monad
 import System.Directory
 import Control.Exception
@@ -16,11 +16,15 @@ run (directory : rest) = do
     ExitFailure _ -> return exitCode
 run [] = return ExitSuccess
 
+checkQuine :: String -> IO ExitCode
 checkQuine directory = do
   directoryExists <- doesDirectoryExist directory
   when (not directoryExists) $
-    throwIO $ ErrorCall ("directory does not exist: " ++ directory)
-  Stdout stdout <- cmd "./quine" (Cwd directory)
+    throwIO $ ErrorCall ("directory not found: " ++ directory)
+  quineExists <- doesFileExist (directory </> "quine")
+  when (not quineExists) $
+    throwIO $ ErrorCall ("quine file not found: " ++ directory </> "quine")
+  Stdout stdout <- cmd (directory </> "quine")
   code <- readFile (directory </> "quine")
   return $ if code == stdout
     then ExitSuccess
