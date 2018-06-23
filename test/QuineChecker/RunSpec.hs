@@ -24,9 +24,12 @@ pythonQuine = unlines $
   "    sys.stdout.write(fh.read())" :
   []
 
-stderrQuine :: String
-stderrQuine = unlines $
-  "foo/quine: 1: foo/quine: foo/quine:: not found" :
+pythonStderrQuine :: String
+pythonStderrQuine = unlines $
+  "#!/usr/bin/env python3" :
+  "import sys" :
+  "with open(__file__, 'r') as fh:" :
+  "    sys.stderr.write(fh.read())" :
   []
 
 pythonNonQuine :: String
@@ -49,7 +52,7 @@ spec = around_ (inTempDirectory . hSilence [stdout, stderr]) $ do
         run ["foo"] `shouldReturn` ExitSuccess
 
       it "allows quines through stderr" $ do
-        writeQuineFile "foo" stderrQuine
+        writeQuineFile "foo" pythonStderrQuine
         run ["foo"] `shouldReturn` ExitSuccess
 
       it "prints the quine" $ do
