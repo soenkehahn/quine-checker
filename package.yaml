@@ -8,6 +8,7 @@ dependencies:
   - base
   - shake
   - filepath
+  - unix
 
 tests:
   spec:

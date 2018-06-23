@@ -80,3 +80,9 @@ spec = around_ (inTempDirectory . silence) $ do
       it "gives a nice error" $ do
         createDirectory "foo"
         run ["foo"] `shouldThrow` errorCall "quine file not found: foo/quine"
+
+    describe "when quine file is not executable" $ do
+      it "gives a nice error" $ do
+        createDirectory "foo"
+        writeFile "foo/quine" "foo"
+        run ["foo"] `shouldThrow` errorCall "executable flag not set on: foo/quine"

@@ -2,6 +2,7 @@
 module QuineChecker.Run where
 
 import System.Exit
+import System.Posix.Files
 import Development.Shake hiding (doesDirectoryExist, doesFileExist)
 import Control.Monad
 import System.Directory
@@ -24,6 +25,9 @@ checkQuine directory = do
   quineExists <- doesFileExist (directory </> "quine")
   when (not quineExists) $
     throwIO $ ErrorCall ("quine file not found: " ++ directory </> "quine")
+  executable <- fileAccess (directory </> "quine") False False True
+  when (not executable) $
+    throwIO $ ErrorCall ("executable flag not set on: " ++ directory </> "quine")
   Stdout stdout <- cmd (directory </> "quine")
   code <- readFile (directory </> "quine")
   return $ if code == stdout
