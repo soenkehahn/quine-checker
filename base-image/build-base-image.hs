@@ -14,6 +14,9 @@ import System.FilePath
 
 main :: IO ()
 main = do
+  unit $ cmd "stack test"
+  unit $ cmd "stack install --local-bin-path base-image/dist"
+  unit $ cmd "docker build --tag soenkehahn/rc-quines-candidate ./base-image"
   files <- filter (not . ("." `isPrefixOf`)) <$>
     getDirectoryContents "base-image/tests"
   forM_ files $ \ file -> do
@@ -24,6 +27,7 @@ main = do
       "soenkehahn/rc-quines-candidate" ("/root" </> file)
     when (output /= "Hello, World!") $
       throwIO $ ErrorCall ("unexpected output: " ++ show output)
+  unit $ cmd "docker build --tag soenkehahn/rc-quines ./base-image"
 
 strip :: String -> String
 strip = reverse . dropWhile isSpace . reverse . dropWhile isSpace
