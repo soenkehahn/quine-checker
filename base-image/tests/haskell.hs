@@ -1,5 +1,4 @@
-#!/usr/bin/env stack
-{- stack script --resolver=lts-11.14 -}
+#!/usr/bin/env runhaskell
 
 main :: IO ()
 main = putStrLn "Hello, World!"
