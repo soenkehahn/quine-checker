@@ -8,7 +8,7 @@ import Control.Monad
 import Data.Char
 import Data.Foldable
 import Data.List
-import Development.Shake (unit, cmd, Stdouterr(..), CmdOption(..))
+import Development.Shake (unit, cmd, Stdouterr(..), CmdOption(..), Exit(..))
 import System.Directory
 import System.FilePath
 
@@ -22,13 +22,19 @@ main = do
   forM_ files $ \ file -> do
     putStrLn ("testing " ++ file)
     currentDir <- getCurrentDirectory
-    Stdouterr (strip -> output) <- cmd (EchoStderr True) (EchoStdout True)
+    (Exit _, Stdouterr (strip -> output)) <- cmd (EchoStderr True) (EchoStdout True)
       "docker run --rm -t -v"
-      (currentDir </> "base-image/tests" </> file ++ ":" ++ "/root" </> file)
-      "soenkehahn/rc-quines-candidate" ("/root" </> file)
-    when (output /= "Hello, World!") $
+      (currentDir </> "base-image/tests" </> file ++ ":" ++ mountPoint file)
+      "soenkehahn/rc-quines-candidate" "quine-checker" "/root/foo"
+    when (not ( "not a quine:" `isPrefixOf` output)) $
       throwIO $ ErrorCall ("unexpected output: " ++ show output)
   unit $ cmd "docker build --tag soenkehahn/rc-quines ./base-image"
 
 strip :: String -> String
 strip = reverse . dropWhile isSpace . reverse . dropWhile isSpace
+
+mountPoint :: FilePath -> FilePath
+mountPoint path = case takeExtension path of 
+  ".c" -> "/root/foo/quine.c"
+  _ -> "/root/foo/quine"
+

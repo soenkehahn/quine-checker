@@ -109,3 +109,22 @@ spec = around_ (inTempDirectory . hSilence [stdout, stderr]) $ do
         createDirectory "foo"
         writeFile "foo/quine" "foo"
         run ["foo"] `shouldThrow` errorCall "executable flag not set on: foo/quine"
+
+    describe "when the language is compiled" $ do
+      it "can check compiled quines" $ do
+        createDirectory "foo"
+        writeFile "foo/quine.c" $ unlines $
+            "#include <stdio.h>" :
+            "int main() {" :
+            "  FILE *file = fopen(\"foo/quine.c\", \"r\");" :
+            "  int c;" :
+            "  if (file) {" :
+            "    while ((c = getc(file)) != EOF) {" :
+            "      putchar(c);" :
+            "    }" :
+            "    fclose(file);" :
+            "  }" :
+            "  return 0;" :
+            "}" :
+            []
+        run ["foo"] `shouldReturn` ExitSuccess
