@@ -8,7 +8,8 @@ RUN apt-get update && apt-get install --yes \
   python \
   python3 \
   ruby \
-  r-base-core
+  r-base-core \
+  rustc
 
 ADD dist/quine-checker /usr/local/bin
 RUN quine-checker

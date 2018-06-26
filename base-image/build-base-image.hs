@@ -34,7 +34,7 @@ strip :: String -> String
 strip = reverse . dropWhile isSpace . reverse . dropWhile isSpace
 
 mountPoint :: FilePath -> FilePath
-mountPoint path = case takeExtension path of 
+mountPoint path = case takeExtension path of
   ".c" -> "/root/foo/quine.c"
+  ".rs" -> "/root/foo/quine.rs"
   _ -> "/root/foo/quine"
-

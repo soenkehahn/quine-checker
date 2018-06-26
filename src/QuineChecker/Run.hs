@@ -70,9 +70,15 @@ compile directory = do
   files <- filter ("quine." `isPrefixOf`) <$>
     getDirectoryContents directory
   case files of
-    [quineSourceFile] -> do
-      unit $ cmd "gcc" quineSourceFile "-o quine" (Cwd directory)
-      return (directory </> quineSourceFile)
+    [quineSourceFile] -> case quineSourceFile of
+      "quine.c" -> do
+        unit $ cmd "gcc" quineSourceFile "-o quine" (Cwd directory)
+        return (directory </> quineSourceFile)
+      "quine.rs" -> do
+        unit $ cmd "rustc" quineSourceFile (Cwd directory)
+        return (directory </> quineSourceFile)
+      _ -> throwIO $
+        ErrorCall ("unknown file extension: " ++ takeExtension quineSourceFile)
     [] -> do
       return (directory </> "quine")
     _ : _ : _ -> do

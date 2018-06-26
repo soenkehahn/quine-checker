@@ -128,3 +128,15 @@ spec = around_ (inTempDirectory . hSilence [stdout, stderr]) $ do
             "}" :
             []
         run ["foo"] `shouldReturn` ExitSuccess
+
+  describe "compile" $ do
+    it "compiles rust programs" $ do
+      createDirectory "foo"
+      writeFile "foo/quine.rs" $ unlines $
+        "fn main() {" :
+        "  println!(\"Hello, World!\");" :
+        "}" :
+        []
+      _ <- compile "foo"
+      Stdout output <- cmd "./foo/quine"
+      output `shouldBe` "Hello, World!\n"
