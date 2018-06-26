@@ -77,6 +77,9 @@ compile directory = do
       "quine.rs" -> do
         unit $ cmd "rustc" quineSourceFile (Cwd directory)
         return (directory </> quineSourceFile)
+      "quine.go" -> do
+        unit $ cmd "go build" quineSourceFile (Cwd directory)
+        return (directory </> quineSourceFile)
       _ -> throwIO $
         ErrorCall ("unknown file extension: " ++ takeExtension quineSourceFile)
     [] -> do

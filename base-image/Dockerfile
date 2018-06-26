@@ -9,7 +9,8 @@ RUN apt-get update && apt-get install --yes \
   python3 \
   ruby \
   r-base-core \
-  rustc
+  rustc \
+  golang
 
 ADD dist/quine-checker /usr/local/bin
 RUN quine-checker

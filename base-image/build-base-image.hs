@@ -37,4 +37,5 @@ mountPoint :: FilePath -> FilePath
 mountPoint path = case takeExtension path of
   ".c" -> "/root/foo/quine.c"
   ".rs" -> "/root/foo/quine.rs"
+  ".go" -> "/root/foo/quine.go"
   _ -> "/root/foo/quine"

@@ -140,3 +140,16 @@ spec = around_ (inTempDirectory . hSilence [stdout, stderr]) $ do
       _ <- compile "foo"
       Stdout output <- cmd "./foo/quine"
       output `shouldBe` "Hello, World!\n"
+
+    it "compiles go programs" $ do
+      createDirectory "foo"
+      writeFile "foo/quine.go" $ unlines $
+        "package main" :
+        "import \"fmt\"" :
+        "func main() {" :
+        "    fmt.Println(\"Hello, World!\")" :
+        "}" :
+        []
+      _ <- compile "foo"
+      Stdout output <- cmd "./foo/quine"
+      output `shouldBe` "Hello, World!\n"
