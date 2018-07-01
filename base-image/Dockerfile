@@ -10,7 +10,8 @@ RUN apt-get update && apt-get install --yes \
   ruby \
   r-base-core \
   rustc \
-  golang
+  golang \
+  clojure
 
 ADD dist/quine-checker /usr/local/bin
 RUN quine-checker
