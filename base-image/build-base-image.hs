@@ -17,7 +17,7 @@ main = do
   unit $ cmd "stack test"
   unit $ cmd "stack install --local-bin-path base-image/dist"
   unit $ cmd "docker build --tag soenkehahn/rc-quines-candidate ./base-image"
-  files <- filter (not . ("." `isPrefixOf`)) <$>
+  files <- sort <$> filter (not . ("." `isPrefixOf`)) <$>
     getDirectoryContents "base-image/tests"
   forM_ files $ \ file -> do
     putStrLn ("testing " ++ file)
@@ -26,9 +26,13 @@ main = do
       "docker run --rm -t -v"
       (currentDir </> "base-image/tests" </> file ++ ":" ++ mountPoint file)
       "soenkehahn/rc-quines-candidate" "quine-checker" "/root/foo"
-    when (not ( "not a quine:" `isPrefixOf` output)) $
+    when (not $ isExpectedOutput output) $
       throwIO $ ErrorCall ("unexpected output: " ++ show output)
   unit $ cmd "docker build --tag soenkehahn/rc-quines ./base-image"
+
+isExpectedOutput output =
+  "not a quine:" `isPrefixOf` output &&
+  "+ Hello, World!" `isSuffixOf` output
 
 strip :: String -> String
 strip = reverse . dropWhile isSpace . reverse . dropWhile isSpace
