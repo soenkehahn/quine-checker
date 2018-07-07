@@ -39,8 +39,7 @@ checkQuine directory = do
   code <- readFile sourceFile
   if code == output
     then do
-      log ("this is a quine: " ++ sourceFile ++ ":\n")
-      log code
+      log ("this is a quine: " ++ sourceFile)
       return ExitSuccess
     else do
       log ("not a quine: " ++ sourceFile)

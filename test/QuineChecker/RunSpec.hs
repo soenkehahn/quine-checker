@@ -46,6 +46,11 @@ spec = around_ (inTempDirectory . hSilence [stdout, stderr]) $ do
         writeQuineFile "foo" pythonQuine
         run ["foo"] `shouldReturn` ExitSuccess
 
+      it "prints a success message, including the filename" $ do
+        writeQuineFile "foo" pythonQuine
+        output <- hCapture_ [stderr] $ run ["foo"]
+        output `shouldContain` "this is a quine: foo/quine"
+
       it "allows quines that exit with a non-zero exitcode" $ do
         let quine = pythonQuine ++ "\nsys.exit(1)"
         writeQuineFile "foo" quine
@@ -55,10 +60,10 @@ spec = around_ (inTempDirectory . hSilence [stdout, stderr]) $ do
         writeQuineFile "foo" pythonStderrQuine
         run ["foo"] `shouldReturn` ExitSuccess
 
-      it "prints the quine" $ do
+      it "doesn't print the quine, to avoid spoilers" $ do
         writeQuineFile "foo" pythonQuine
         output <- hCapture_ [stderr] $ run ["foo"]
-        output `shouldContain` ("this is a quine: foo/quine:\n\n" ++ pythonQuine)
+        output `shouldNotContain` pythonQuine
 
       it "can checks multiple quines" $ do
         writeQuineFile "foo" pythonQuine
